@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio Nathan Montoir</title>
+<meta name="description" content="Portfolio de géomatique et de cartographie de Nathan Montoir.">
+<style>
+/* Planche d'atlas : une colonne large, des cartouches bordés comme sur une carte,
+   la légende des volets sert de filtre, les cartes occupent toute la largeur. */
+:root{
+  --papier:#F1F3EF;
+  --blanc:#FBFCFA;
+  --encre:#17221E;
+  --gris:#56645E;
+  --trait:#C7D0C9;
+  --foret:#2C5C47;
+  --bistre:#B4622B;
+  --titre:"Archivo","Arial Narrow",Arial,sans-serif;
+  --texte:"Archivo",Arial,Helvetica,sans-serif;
+  --carte:"Newsreader",Georgia,"Times New Roman",serif;
+  color-scheme:light;
+}
+@font-face{font-family:"Archivo";src:url("assets/fonts/archivo.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:swap}
+@font-face{font-family:"Newsreader";src:url("assets/fonts/newsreader-italic.woff2") format("woff2");font-weight:200 800;font-style:italic;font-display:swap}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--papier);color:var(--encre);font-family:var(--texte);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+img,video{max-width:100%;display:block}
+a{color:var(--foret);text-underline-offset:.18em}
+a:hover{color:var(--encre)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--bistre);outline-offset:2px}
+h1,h2,h3{font-family:var(--titre);font-stretch:116%;font-weight:680;line-height:1.08;letter-spacing:-.012em;margin:0;text-wrap:balance}
+p{margin:0}
+.page{max-width:1240px;margin:0 auto;padding:0 clamp(16px,4vw,48px)}
+/* Règle graduée, reprise du cadre à damier des cartes */
+.regle{height:7px;background:repeating-linear-gradient(90deg,var(--encre) 0 56px,var(--blanc) 56px 112px);border-bottom:1px solid var(--encre)}
+.etiquette{font-family:var(--carte);font-style:italic;font-size:1.02rem;letter-spacing:.14em;color:var(--gris)}
+
+/* En-tête */
+.entete{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 32px;padding:18px 0;border-bottom:1px solid var(--trait)}
+.entete .nom{font-family:var(--titre);font-stretch:116%;font-weight:700;font-size:1.05rem;color:var(--encre);text-decoration:none}
+.entete nav{display:flex;flex-wrap:wrap;gap:6px 26px}
+.entete nav a{color:var(--encre);text-decoration:none;font-size:.95rem;font-weight:500}
+.entete nav a:hover{text-decoration:underline}
+
+/* Accueil */
+.accueil{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(24px,5vw,64px);align-items:center;padding:clamp(36px,6vw,76px) 0}
+.accueil h1{font-size:clamp(2.7rem,6.4vw,5.2rem);font-weight:740;margin:.18em 0 .22em}
+.accueil .metier{font-family:var(--titre);font-stretch:116%;font-weight:560;font-size:clamp(1.15rem,2vw,1.45rem);color:var(--foret)}
+.accueil .accroche{margin-top:18px;max-width:34em;font-size:1.08rem;color:var(--gris)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.bouton{display:inline-block;padding:11px 20px;border:1.5px solid var(--encre);background:var(--encre);color:var(--blanc);text-decoration:none;font-weight:600;font-size:.95rem;border-radius:2px;cursor:pointer}
+.bouton:hover{background:var(--foret);border-color:var(--foret);color:var(--blanc)}
+.bouton.clair{background:transparent;color:var(--encre)}
+.bouton.clair:hover{background:var(--encre);color:var(--blanc)}
+.accueil figure{margin:0}
+.accueil figure img{border:1px solid var(--encre);box-shadow:10px 10px 0 var(--trait);width:100%;cursor:zoom-in}
+figcaption{font-size:.86rem;color:var(--gris);margin-top:10px;line-height:1.45}
+.accueil figcaption{margin-top:20px}
+
+
+/* Accueil pleine page : la carte occupe toute la largeur, un voile flouté porte le texte à gauche,
+   le cœur du village reste net à droite. Le point à mettre en valeur se règle dans contenu.js. */
+html{overflow-x:clip}
+.accueil-plein{position:relative;margin:0 calc(50% - 50vw);width:100vw;display:flex;align-items:center;overflow:hidden;border-bottom:1px solid var(--encre);background:var(--papier);
+  --ratio:1.4317;--cx:.539;--cy:.505;--py:.5;--min:76vw;
+  /* Carte calée à droite et dézoomée au maximum : sa hauteur égale celle du bandeau.
+     --min évite que la carte devienne trop étroite sur les écrans très larges. */
+  --H:clamp(560px,80vh,840px);
+  --S:max(calc(var(--H) * var(--ratio)), var(--min));
+  --L:calc(100vw - var(--S));
+  --Y:min(0px, max(calc(var(--H) - var(--S) / var(--ratio)), calc(var(--py) * var(--H) - var(--cy) * var(--S) / var(--ratio))));
+  min-height:var(--H)}
+.accueil-plein .fond,.accueil-plein .miroir{position:absolute;top:0;bottom:0;width:var(--S);background-image:var(--image);background-repeat:no-repeat;background-size:var(--S) auto;background-position:0 var(--Y)}
+.accueil-plein .fond{left:var(--L);-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 6vw);mask-image:linear-gradient(90deg,transparent 0,#000 6vw)}
+/* À gauche de la carte, son reflet prolonge le dessin ; le raccord se fait en fondu */
+.accueil-plein .miroir{left:0;width:calc(var(--L) + 6vw);transform:scaleX(-1);filter:blur(5px)}
+.accueil-plein .voile{position:absolute;inset:0;background:rgba(241,243,239,.66);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+  -webkit-mask-image:linear-gradient(90deg,#000 0,#000 33%,rgba(0,0,0,.55) 43%,transparent 56%);mask-image:linear-gradient(90deg,#000 0,#000 33%,rgba(0,0,0,.55) 43%,transparent 56%)}
+.accueil-plein .interieur{position:relative;width:100%;max-width:1240px;margin:0 auto;padding:clamp(48px,8vh,96px) clamp(16px,4vw,48px)}
+.accueil-plein .texte{max-width:470px}
+.accueil-plein h1{font-size:clamp(2.7rem,6.4vw,5.2rem);font-weight:740;margin:.18em 0 .22em}
+.accueil-plein .metier{font-family:var(--titre);font-stretch:116%;font-weight:560;font-size:clamp(1.15rem,2vw,1.45rem);color:var(--foret)}
+.accueil-plein .accroche{margin-top:18px;font-size:1.08rem;color:var(--encre)}
+.accueil-plein .credit{position:absolute;right:clamp(16px,4vw,48px);bottom:18px;display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px;max-width:min(560px,90vw)}
+.accueil-plein .credit figcaption{margin:0;padding:6px 10px;background:rgba(251,252,250,.9);border:1px solid var(--trait);font-size:.82rem;color:var(--gris)}
+.accueil-plein .credit button{padding:6px 12px;background:var(--encre);color:var(--blanc);border:0;border-radius:2px;font-size:.82rem;font-weight:600;cursor:zoom-in}
+.accueil-plein .credit button:hover{background:var(--foret)}
+.accueil-plein + .section{border-top:0}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.accueil-plein .voile{background:rgba(241,243,239,.9)}}
+@media (max-width:760px){
+  .accueil-plein{min-height:0;align-items:flex-start;--S:1700px;--L:calc(55vw - .539 * 1700px);--H:830px;--Y:calc(.7 * 830px - .505 * 1700px / 1.4317)}
+  .accueil-plein .fond{-webkit-mask-image:none;mask-image:none}
+  .accueil-plein .miroir{display:none}
+  .accueil-plein .voile{-webkit-mask-image:linear-gradient(180deg,#000 0,#000 58%,transparent 72%);mask-image:linear-gradient(180deg,#000 0,#000 58%,transparent 72%)}
+  .accueil-plein .interieur{padding-bottom:330px}
+  .accueil-plein .credit{left:16px;justify-content:flex-start}
+}
+
+/* Sections */
+.section{padding:clamp(34px,5vw,60px) 0;border-top:1px solid var(--encre)}
+.section>h2{font-size:clamp(1.7rem,3.2vw,2.5rem);margin-bottom:26px}
+
+/* Légende-filtre */
+.legende{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;padding:14px 16px;background:var(--blanc);border:1px solid var(--encre);margin-bottom:28px}
+.legende .etiquette{margin-right:8px}
+.legende button{display:inline-flex;align-items:center;gap:9px;padding:6px 12px 6px 9px;background:transparent;border:1px solid transparent;border-radius:2px;cursor:pointer;font-size:.93rem;font-weight:500}
+.legende button:hover{border-color:var(--trait)}
+.legende button[aria-pressed="true"]{border-color:var(--encre);background:var(--papier)}
+.legende .nb{color:var(--gris);font-variant-numeric:tabular-nums;font-weight:400}
+.pastille{width:20px;height:13px;border:1px solid var(--encre);flex:none;display:inline-block}
+
+/* Grille de projets */
+.grille{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:26px}
+.carte-projet{grid-column:span 2;display:flex;flex-direction:column;background:var(--blanc);border:1px solid var(--trait);color:inherit;text-decoration:none;transition:border-color .15s,transform .15s}
+.carte-projet.une{grid-column:span 3}
+.carte-projet:hover{border-color:var(--encre);transform:translateY(-2px);color:inherit}
+@media (prefers-reduced-motion:reduce){.carte-projet,.carte-projet:hover{transition:none;transform:none}}
+.carte-projet .vue{aspect-ratio:3/2;overflow:hidden;border-bottom:1px solid var(--trait);background:var(--papier)}
+.carte-projet .vue img{width:100%;height:100%;object-fit:cover;object-position:50% 0}
+.carte-projet .planche{display:flex;align-items:center;justify-content:center;height:100%;padding:24px;text-align:center;font-family:var(--carte);font-style:italic;font-size:1.5rem;letter-spacing:.12em;color:var(--blanc)}
+.carte-projet .corps{display:flex;flex-direction:column;gap:8px;padding:16px 18px 18px;flex:1}
+.volet{display:flex;align-items:center;gap:9px;font-size:.82rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--gris)}
+.carte-projet h3{font-size:1.28rem}
+.carte-projet.une h3{font-size:1.6rem}
+.carte-projet .resume{font-size:.95rem;color:var(--gris)}
+.carte-projet .pied{margin-top:auto;padding-top:8px;font-size:.84rem;color:var(--gris);font-variant-numeric:tabular-nums}
+
+/* Profil */
+.profil{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(24px,5vw,64px)}
+.prose{white-space:pre-line;max-width:65ch}
+.recherche{margin-top:20px;padding:14px 16px;border-left:4px solid var(--bistre);background:var(--blanc);max-width:65ch}
+.tableau{display:grid;gap:0;border-top:1px solid var(--encre)}
+.tableau .ligne{display:grid;grid-template-columns:minmax(0,11.5em) minmax(0,1fr);gap:16px;padding:11px 0;border-bottom:1px solid var(--trait)}
+.tableau .cle{font-weight:650;font-size:.95rem}
+.tableau .val{font-size:.95rem;color:var(--gris)}
+.tableau .val strong{color:var(--encre);font-weight:650;display:block}
+.profil h3{font-size:1.15rem;margin:0 0 12px}
+.profil h3:not(:first-child){margin-top:34px}
+.contact{display:flex;flex-wrap:wrap;gap:14px 44px}
+.contact div{min-width:12em}
+.contact .cle{font-size:.82rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--gris)}
+.contact .val{font-size:1.08rem;font-weight:560}
+
+/* Fiche projet */
+.retour{display:inline-block;margin:26px 0 0;font-weight:600;font-size:.95rem;text-decoration:none}
+.retour:hover{text-decoration:underline}
+.fiche-tete{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,5fr);gap:clamp(24px,5vw,60px);align-items:start;padding:26px 0 40px}
+.fiche-tete h1{font-size:clamp(2.1rem,4.6vw,3.6rem);font-weight:720;margin:14px 0 8px}
+.fiche-tete .lieu{display:block;margin-bottom:16px}
+.fiche-tete .resume{font-size:1.15rem;max-width:32em}
+.cartouche{background:var(--blanc);border:1px solid var(--encre);padding:4px 18px;box-shadow:8px 8px 0 var(--trait)}
+.cartouche .ligne{display:grid;grid-template-columns:5.2em minmax(0,1fr);gap:14px;padding:10px 0;border-bottom:1px solid var(--trait);font-size:.92rem}
+.cartouche .ligne:last-child{border-bottom:0}
+.cartouche .cle{font-family:var(--carte);font-style:italic;letter-spacing:.06em;color:var(--gris)}
+.chiffres{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:0;border:1px solid var(--encre);background:var(--blanc);margin-bottom:44px}
+.chiffres>div{padding:18px 20px;border-right:1px solid var(--trait)}
+.chiffres>div:last-child{border-right:0}
+.chiffres .valeur{font-family:var(--titre);font-stretch:116%;font-weight:720;font-size:clamp(1.5rem,2.6vw,2.05rem);line-height:1.1;font-variant-numeric:tabular-nums;color:var(--foret)}
+.chiffres .legende-chiffre{font-size:.9rem;color:var(--gris);margin-top:6px;line-height:1.4}
+.blocs{display:flex;flex-direction:column;gap:38px;padding-bottom:56px}
+.bloc-texte{max-width:68ch}
+.bloc-texte h2{font-size:1.5rem;margin-bottom:10px}
+.bloc-texte .prose{font-size:1.04rem}
+figure{margin:0}
+.zoom{display:block;padding:0;border:1px solid var(--trait);background:var(--blanc);cursor:zoom-in;width:100%}
+.zoom:hover{border-color:var(--encre)}
+.zoom img{width:100%}
+.fig.moyenne{max-width:680px}
+.galerie{display:grid;gap:22px;grid-template-columns:repeat(var(--col,2),minmax(0,1fr))}
+.avant-apres{max-width:720px}
+.comparateur{position:relative;border:1px solid var(--encre);--pos:50%;user-select:none;background:var(--blanc)}
+.comparateur img{width:100%}
+.comparateur .dessus{position:absolute;inset:0;clip-path:inset(0 calc(100% - var(--pos)) 0 0)}
+.comparateur .dessus img{height:100%;object-fit:cover}
+.comparateur .barre{position:absolute;top:0;bottom:0;left:var(--pos);width:2px;margin-left:-1px;background:var(--bistre);pointer-events:none}
+.comparateur .barre::after{content:"◂ ▸";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bistre);color:#fff;font-size:.8rem;padding:6px 8px;border-radius:2px;white-space:nowrap}
+.comparateur input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize}
+.comparateur .coin{position:absolute;bottom:10px;padding:3px 9px;background:var(--encre);color:var(--blanc);font-size:.78rem;font-weight:600;pointer-events:none}
+.comparateur .coin.g{left:10px}.comparateur .coin.d{right:10px}
+.videos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+.videos video{width:100%;border:1px solid var(--trait);background:var(--blanc)}
+.videos .titre-video{font-weight:600;font-size:.92rem;margin-bottom:8px}
+pre{margin:0;padding:18px 20px;background:var(--encre);color:#E6ECE7;font-family:ui-monospace,"Cascadia Mono",Consolas,Menlo,monospace;font-size:.86rem;line-height:1.55;overflow-x:auto;border-radius:2px}
+.bloc-code{max-width:760px}
+.bloc-code h2{font-size:1.1rem;margin-bottom:10px}
+.suivants{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;padding:26px 0 54px;border-top:1px solid var(--encre)}
+.suivants a{text-decoration:none;font-weight:600;max-width:46%}
+.suivants a span{display:block;font-size:.8rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--gris)}
+.suivants a:hover{text-decoration:underline}
+
+/* Pied */
+.pied-page{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 24px;padding:20px 0 30px;font-size:.86rem;color:var(--gris)}
+.pied-page button{background:none;border:0;padding:0;color:var(--foret);text-decoration:underline;cursor:pointer}
+
+/* Visionneuse */
+.visionneuse{position:fixed;inset:0;z-index:50;background:rgba(15,22,19,.96);display:none;flex-direction:column}
+.visionneuse.ouverte{display:flex}
+.visionneuse .scene{flex:1;overflow:hidden;position:relative;cursor:grab;touch-action:none}
+.visionneuse .scene.saisie{cursor:grabbing}
+.visionneuse .scene img{position:absolute;left:50%;top:50%;max-width:none;transform-origin:0 0;user-select:none;-webkit-user-drag:none}
+.visionneuse .bandeau{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 20px;padding:10px 16px;color:#E6ECE7;font-size:.9rem}
+.visionneuse .outils{display:flex;gap:6px}
+.visionneuse button{min-width:40px;height:40px;padding:0 12px;background:transparent;border:1px solid #6D7A74;color:#E6ECE7;cursor:pointer;border-radius:2px;font-size:1rem}
+.visionneuse button:hover{background:#E6ECE7;color:var(--encre)}
+
+/* Mode édition */
+.barre-edition{position:fixed;left:0;right:0;bottom:0;z-index:40;display:none;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:12px clamp(16px,4vw,48px);background:var(--encre);color:var(--blanc);font-size:.92rem}
+body.edition .barre-edition{display:flex}
+body.edition{padding-bottom:74px}
+body.edition [data-k]{outline:1.5px dashed var(--bistre);outline-offset:3px;cursor:text;min-width:1.5em}
+body.edition [data-k]:focus{outline:2.5px solid var(--bistre);background:#FFF6EC;color:var(--encre)}
+.barre-edition .bouton{background:var(--bistre);border-color:var(--bistre);padding:8px 16px}
+.barre-edition .bouton.clair{background:transparent;border-color:#8B9791;color:var(--blanc)}
+.barre-edition .message{margin-left:auto;font-weight:600}
+
+@media (max-width:900px){
+  .accueil,.profil,.fiche-tete{grid-template-columns:minmax(0,1fr)}
+  .grille{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .carte-projet,.carte-projet.une{grid-column:span 1}
+  .galerie{grid-template-columns:repeat(min(var(--col,2),2),minmax(0,1fr))}
+  .chiffres>div{border-right:0;border-bottom:1px solid var(--trait)}
+  .chiffres>div:last-child{border-bottom:0}
+}
+@media (max-width:560px){
+  body{font-size:16px}
+  .grille,.videos,.galerie{grid-template-columns:minmax(0,1fr)}
+  .tableau .ligne{grid-template-columns:minmax(0,1fr);gap:2px}
+  .suivants a{max-width:100%}
+}
+</style>
+</head>
+<body>
+<div class="regle" aria-hidden="true"></div>
+<div class="page">
+  <header class="entete">
+    <a class="nom" href="#accueil" id="lien-nom"></a>
+    <nav aria-label="Navigation principale" id="nav"></nav>
+  </header>
+  <main id="vue"></main>
+  <footer class="pied-page" id="pied"></footer>
+</div>
+
+<div class="visionneuse" id="visionneuse" role="dialog" aria-modal="true" aria-label="Agrandissement de l'image">
+  <div class="bandeau">
+    <span id="vis-legende"></span>
+    <span class="outils">
+      <button type="button" id="vis-prec" aria-label="Image précédente">←</button>
+      <button type="button" id="vis-suiv" aria-label="Image suivante">→</button>
+      <button type="button" id="vis-moins" aria-label="Dézoomer">−</button>
+      <button type="button" id="vis-plus" aria-label="Zoomer">+</button>
+      <button type="button" id="vis-fermer">Fermer</button>
+    </span>
+  </div>
+  <div class="scene" id="vis-scene"><img id="vis-img" alt=""></div>
+</div>
+
+<div class="barre-edition" id="barre-edition">
+  <span>Mode édition : clique sur un texte encadré pour le modifier.</span>
+  <button type="button" class="bouton" id="ed-enregistrer">Enregistrer contenu.js</button>
+  <button type="button" class="bouton clair" id="ed-quitter">Quitter</button>
+  <span class="message" id="ed-message" role="status"></span>
+</div>
+
+<script>window.ACCUEIL_FORCE="pleine-page";</script>
+<script src="contenu.js"></script>
+<script>
+(function(){
+"use strict";
+var D = window.PORTFOLIO;
+var vue = document.getElementById("vue");
+var filtre = "";
+var edition = false;
+var PDF = "assets/docs/Portfolio_Nathan_Montoir.pdf";
+
+/* ---------- Outils ---------- */
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function typo(s){
+  return String(s==null?"":s)
+    .replace(/ ([:;?!»%])/g," $1").replace(/« /g,"« ")
+    .replace(/(\d) (\d{3})(?!\d)/g,"$1 $2")
+    .replace(/(\d) (km²|km|ha|min|m|h)(?![\wÀ-ÿ])/g,"$1 $2");
+}
+function lire(chemin){return chemin.split(".").reduce(function(o,k){return o==null?o:o[k]},D)}
+function ecrire(chemin,v){var ks=chemin.split("."),o=D;for(var i=0;i<ks.length-1;i++)o=o[ks[i]];o[ks[ks.length-1]]=v}
+/* Élément de texte modifiable : relié à une entrée de contenu.js par son chemin */
+function T(chemin,balise,classe){
+  return "<"+(balise||"span")+(classe?' class="'+classe+'"':"")+' data-k="'+chemin+'">'+esc(typo(lire(chemin)))+"</"+(balise||"span")+">";
+}
+function src(img,grand){
+  if(/[\/.]/.test(img)) return img;                       /* chemin complet fourni tel quel */
+  return "assets/img/"+img+(grand?".webp":"-m.jpg");
+}
+function couleur(volet){var v=D.volets.filter(function(x){return x.nom===volet})[0];return v?v.couleur:"#888"}
+function pastille(volet){return '<span class="pastille" style="background:'+couleur(volet)+'" aria-hidden="true"></span>'}
+function docs(){return D.reglages && D.reglages.liens_documents}
+
+/* ---------- En-tête et pied ---------- */
+function cadre(){
+  document.getElementById("lien-nom").textContent = D.profil.nom;
+  var n='<a href="#projets">Projets</a><a href="#profil">Profil</a><a href="#contact">Contact</a>';
+  if(docs()) n+='<a href="'+PDF+'">Version PDF</a>';
+  document.getElementById("nav").innerHTML=n;
+  var p="<span>"+esc(D.profil.nom)+" · "+esc(D.profil.metier)+"</span>";
+  if(location.protocol==="file:"||/[?&]edition/.test(location.search)) p+='<button type="button" id="ouvrir-edition">Modifier les textes</button>';
+  document.getElementById("pied").innerHTML=p;
+  var b=document.getElementById("ouvrir-edition"); if(b) b.onclick=function(){basculerEdition(true)};
+}
+
+/* ---------- Accueil ---------- */
+function carteProjet(p,i,une){
+  var vueImg = p.couverture
+    ? '<img src="'+src(p.couverture)+'" alt="" loading="lazy">'
+    : '<div class="planche" style="background:'+couleur(p.volet)+'">Récit en ligne</div>';
+  return '<a class="carte-projet'+(une?" une":"")+'" href="#'+p.id+'">'
+    +'<div class="vue">'+vueImg+'</div><div class="corps">'
+    +'<div class="volet">'+pastille(p.volet)+esc(p.volet)+'</div>'
+    +T("projets."+i+".titre","h3")
+    +T("projets."+i+".resume","p","resume")
+    +'<div class="pied">'+T("projets."+i+".lieu")+" · "+T("projets."+i+".date")+'</div>'
+    +'</div></a>';
+}
+function modeAccueil(){return window.ACCUEIL_FORCE || (D.reglages && D.reglages.accueil) || "cote"}
+function heroPlein(){
+  var P=D.profil, R=D.reglages||{}, c=R.accueil_point || {};
+  var img=R.accueil_image ? src(R.accueil_image,true) : (P.image_accueil==="vil-salles" ? "assets/img/vil-salles-hero.webp" : src(P.image_accueil,true));
+  var st="--image:url('"+img+"')";
+  if(c.y!=null) st+=";--cy:"+c.y; if(c.largeur_min!=null) st+=";--min:"+c.largeur_min; if(c.ratio!=null) st+=";--ratio:"+c.ratio;
+  return '<section class="accueil-plein" id="accueil" style="'+st+'">'
+    +'<div class="miroir" aria-hidden="true"></div><div class="fond" aria-hidden="true"></div><div class="voile" aria-hidden="true"></div>'
+    +'<div class="interieur"><div class="texte"><span class="etiquette">Portfolio de géomatique</span>'
+    +T("profil.nom","h1")+T("profil.metier","p","metier")+T("profil.accroche","p","accroche")
+    +'<div class="actions"><a class="bouton" href="#projets">Voir les projets</a>'
+    +(docs()?'<a class="bouton clair" href="'+PDF+'">Télécharger le PDF</a>':"")+'</div></div></div>'
+    +'<div class="credit">'+T("profil.legende_accueil","figcaption")+'</div></section>';
+}
+function accueil(){
+  var P=D.profil, h="";
+  if(modeAccueil()==="pleine-page"){ h+=heroPlein(); } else {
+  h+='<section class="accueil" id="accueil"><div>'
+    +'<span class="etiquette">Portfolio de géomatique</span>'
+    +T("profil.nom","h1")+T("profil.metier","p","metier")+T("profil.accroche","p","accroche")
+    +'<div class="actions"><a class="bouton" href="#projets">Voir les projets</a>'
+    +(docs()?'<a class="bouton clair" href="'+PDF+'">Télécharger le PDF</a>':"")+'</div></div>'
+    +'<figure><img src="'+src(P.image_accueil)+'" alt="" data-zoom="'+P.image_accueil+'" data-legende="'+esc(P.legende_accueil)+'">'
+    +T("profil.legende_accueil","figcaption")+'</figure></section>';
+  }
+
+  h+='<section class="section" id="projets"><h2>Projets</h2><div class="legende" role="group" aria-label="Filtrer par volet">'
+    +'<button type="button" data-filtre="" aria-pressed="'+(filtre===""?"true":"false")+'">Tous <span class="nb">'+D.projets.length+'</span></button>';
+  D.volets.forEach(function(v){
+    var nb=D.projets.filter(function(p){return p.volet===v.nom}).length; if(!nb) return;
+    h+='<button type="button" data-filtre="'+esc(v.nom)+'" aria-pressed="'+(filtre===v.nom?"true":"false")+'">'+pastille(v.nom)+esc(v.nom)+' <span class="nb">'+nb+'</span></button>';
+  });
+  h+='</div><div class="grille">';
+  var rang=0;
+  D.projets.forEach(function(p,i){ if(filtre && p.volet!==filtre) return; h+=carteProjet(p,i,!filtre && rang<2); rang++; });
+  h+='</div></section>';
+
+  h+='<section class="section" id="profil"><h2>Profil</h2><div class="profil"><div>'
+    +T("profil.a_propos","p","prose")+T("profil.recherche","p","recherche")
+    +'<h3>Parcours</h3><div class="tableau">';
+  D.parcours.forEach(function(x,i){
+    h+='<div class="ligne">'+T("parcours."+i+".periode","div","cle")+'<div class="val"><strong data-k="parcours.'+i+'.titre">'+esc(typo(x.titre))+'</strong>'+T("parcours."+i+".detail")+'</div></div>';
+  });
+  h+='</div></div><div><h3>Compétences</h3><div class="tableau">';
+  D.competences.forEach(function(c,i){
+    h+='<div class="ligne">'+T("competences."+i+".titre","div","cle")+T("competences."+i+".liste","div","val")+'</div>';
+  });
+  h+='</div></div></div></section>';
+
+  h+='<section class="section" id="contact"><h2>Contact</h2><div class="contact">';
+  P.contact.forEach(function(c,i){
+    var v=T("profil.contact."+i+".valeur");
+    if(c.url && !edition) v='<a href="'+esc(c.url)+'">'+v+'</a>';
+    h+='<div><div class="cle">'+T("profil.contact."+i+".libelle")+'</div><div class="val">'+v+'</div></div>';
+  });
+  h+='</div></section>';
+  vue.innerHTML=h;
+}
+
+/* ---------- Fiche projet ---------- */
+function figure(img,cheminLegende,taille){
+  var leg=cheminLegende?lire(cheminLegende):"";
+  return '<figure class="fig'+(taille?" "+taille:"")+'"><button type="button" class="zoom" data-zoom="'+esc(img)+'" data-legende="'+esc(leg)+'" aria-label="Agrandir : '+esc(leg)+'">'
+    +'<img src="'+src(img)+'" alt="'+esc(leg)+'" loading="lazy"></button>'
+    +(cheminLegende?T(cheminLegende,"figcaption"):"")+'</figure>';
+}
+function bloc(b,base){
+  if(b.type==="texte") return '<section class="bloc-texte">'+T(base+".titre","h2")+T(base+".texte","p","prose")+'</section>';
+  if(b.type==="image") return figure(b.img,base+".legende",b.taille);
+  if(b.type==="galerie") return '<div class="galerie" style="--col:'+(b.colonnes||2)+'">'+b.images.map(function(im,j){return figure(im.img,base+".images."+j+".legende")}).join("")+'</div>';
+  if(b.type==="avant-apres") return '<figure class="avant-apres"><div class="comparateur">'
+    +'<img src="'+src(b.apres)+'" alt="Image après traitement">'
+    +'<div class="dessus"><img src="'+src(b.avant)+'" alt="Image avant traitement"></div>'
+    +'<span class="coin g">Avant</span><span class="coin d">Après</span><div class="barre"></div>'
+    +'<input type="range" min="0" max="100" value="50" id="curseur-'+base.replace(/\./g,"-")+'" aria-label="Position du comparateur avant et après"></div>'
+    +T(base+".legende","figcaption")+'</figure>';
+  if(b.type==="videos") return '<figure><div class="videos">'+b.videos.map(function(v,j){
+      return '<div>'+T(base+".videos."+j+".titre","div","titre-video")
+        +'<video controls muted loop playsinline preload="none" poster="assets/video/'+v.src+'.jpg" src="assets/video/'+v.src+'.mp4"></video></div>';
+    }).join("")+'</div>'+T(base+".legende","figcaption")+'</figure>';
+  if(b.type==="code") return '<section class="bloc-code">'+T(base+".titre","h2")+'<pre><code data-k="'+base+'.code">'+esc(b.code)+'</code></pre></section>';
+  return "";
+}
+function fiche(i){
+  var p=D.projets[i], b="projets."+i, h="";
+  h+='<a class="retour" href="#projets">← Tous les projets</a>';
+  h+='<header class="fiche-tete"><div><div class="volet">'+pastille(p.volet)+esc(p.volet)+'</div>'
+    +T(b+".titre","h1")+T(b+".lieu","span","etiquette lieu")+T(b+".resume","p","resume")
+    +'<div class="actions">'
+    +(p.lien?'<a class="bouton" href="'+esc(p.lien.url)+'" target="_blank" rel="noopener">'+T(b+".lien.texte")+' ↗</a>':"")
+    +(p.document && docs()?'<a class="bouton clair" href="'+esc(p.document.fichier)+'">'+T(b+".document.texte")+'</a>':"")
+    +'</div></div><div class="cartouche">';
+  [["cadre","Cadre"],["date","Date"],["role","Rôle"],["outils","Outils"],["sources","Sources"]].forEach(function(c){
+    h+='<div class="ligne"><div class="cle">'+c[1]+'</div>'+T(b+"."+c[0],"div")+'</div>';
+  });
+  h+='</div></header>';
+  if(p.chiffres && p.chiffres.length){
+    h+='<div class="chiffres">'+p.chiffres.map(function(c,j){
+      return '<div>'+T(b+".chiffres."+j+".valeur","div","valeur")+T(b+".chiffres."+j+".legende","div","legende-chiffre")+'</div>';
+    }).join("")+'</div>';
+  }
+  h+='<div class="blocs">'+p.blocs.map(function(x,j){return bloc(x,b+".blocs."+j)}).join("")+'</div>';
+  var av=D.projets[(i-1+D.projets.length)%D.projets.length], ap=D.projets[(i+1)%D.projets.length];
+  h+='<nav class="suivants" aria-label="Autres projets"><a href="#'+av.id+'"><span>← Projet précédent</span>'+esc(typo(av.titre))+'</a>'
+    +'<a href="#'+ap.id+'" style="text-align:right"><span>Projet suivant →</span>'+esc(typo(ap.titre))+'</a></nav>';
+  vue.innerHTML=h;
+}
+
+/* ---------- Navigation par ancre ---------- */
+function afficher(){
+  var id=location.hash.replace(/^#/,""), i=-1;
+  D.projets.forEach(function(p,k){if(p.id===id)i=k});
+  if(i>=0){ fiche(i); document.title=D.projets[i].titre+" · "+D.profil.nom; window.scrollTo(0,0); }
+  else{
+    accueil(); document.title="Portfolio "+D.profil.nom;
+    var c=id?document.getElementById(id):null;
+    if(c) c.scrollIntoView(); else window.scrollTo(0,0);
+  }
+  if(edition) activerChamps();
+}
+window.addEventListener("hashchange",afficher);
+
+/* ---------- Interactions déléguées ---------- */
+vue.addEventListener("click",function(e){
+  var f=e.target.closest("[data-filtre]");
+  if(f){ filtre=f.getAttribute("data-filtre"); var y=window.scrollY; accueil(); if(edition)activerChamps(); window.scrollTo(0,y); return; }
+  if(edition && e.target.closest("[data-k]")){ e.preventDefault(); return; }
+  var z=e.target.closest("[data-zoom]");
+  if(z){ ouvrirVisionneuse(z); }
+});
+vue.addEventListener("input",function(e){
+  if(e.target.type==="range"){ e.target.parentNode.style.setProperty("--pos",e.target.value+"%"); return; }
+  var k=e.target.getAttribute && e.target.getAttribute("data-k");
+  if(edition && k){ ecrire(k,e.target.innerText.replace(/[  ]/g," ").replace(/\n+$/,"")); message("Modifications non enregistrées"); }
+});
+
+/* ---------- Visionneuse (zoom et déplacement) ---------- */
+var vis=document.getElementById("visionneuse"), scene=document.getElementById("vis-scene"), vimg=document.getElementById("vis-img");
+var liste=[], rang=0, ech=1, tx=0, ty=0, base=1;
+function poser(){ vimg.style.transform="translate("+tx+"px,"+ty+"px) scale("+ech+")"; }
+function cadrer(){
+  var w=vimg.naturalWidth,h=vimg.naturalHeight,W=scene.clientWidth,H=scene.clientHeight;
+  base=Math.min(W/w,H/h,1); ech=base; tx=-w*ech/2; ty=-h*ech/2; poser();
+}
+function montrer(){
+  var el=liste[rang]; document.getElementById("vis-legende").textContent=el.getAttribute("data-legende")||"";
+  vimg.onload=cadrer; vimg.src=src(el.getAttribute("data-zoom"),true);
+}
+function ouvrirVisionneuse(el){
+  liste=[].slice.call(vue.querySelectorAll("[data-zoom]")); rang=Math.max(0,liste.indexOf(el));
+  vis.classList.add("ouverte"); document.body.style.overflow="hidden"; montrer(); document.getElementById("vis-fermer").focus();
+}
+function fermer(){ vis.classList.remove("ouverte"); document.body.style.overflow=""; vimg.removeAttribute("src"); if(liste[rang]&&liste[rang].focus) liste[rang].focus(); }
+function zoomer(f,cx,cy){
+  var r=scene.getBoundingClientRect(); if(cx==null){cx=r.width/2;cy=r.height/2}
+  var ox=cx-r.width/2, oy=cy-r.height/2, n=Math.max(base*0.6,Math.min(ech*f,6)); f=n/ech;
+  tx=ox-(ox-tx)*f; ty=oy-(oy-ty)*f; ech=n; poser();
+}
+function pas(d){ rang=(rang+d+liste.length)%liste.length; montrer(); }
+document.getElementById("vis-fermer").onclick=fermer;
+document.getElementById("vis-plus").onclick=function(){zoomer(1.4)};
+document.getElementById("vis-moins").onclick=function(){zoomer(1/1.4)};
+document.getElementById("vis-prec").onclick=function(){pas(-1)};
+document.getElementById("vis-suiv").onclick=function(){pas(1)};
+scene.addEventListener("wheel",function(e){e.preventDefault();var r=scene.getBoundingClientRect();zoomer(e.deltaY<0?1.2:1/1.2,e.clientX-r.left,e.clientY-r.top)},{passive:false});
+var glisse=null;
+scene.addEventListener("pointerdown",function(e){glisse={x:e.clientX-tx,y:e.clientY-ty};scene.classList.add("saisie");scene.setPointerCapture(e.pointerId)});
+scene.addEventListener("pointermove",function(e){if(!glisse)return;tx=e.clientX-glisse.x;ty=e.clientY-glisse.y;poser()});
+scene.addEventListener("pointerup",function(){glisse=null;scene.classList.remove("saisie")});
+scene.addEventListener("dblclick",function(e){var r=scene.getBoundingClientRect();zoomer(1.8,e.clientX-r.left,e.clientY-r.top)});
+document.addEventListener("keydown",function(e){
+  if(!vis.classList.contains("ouverte"))return;
+  if(e.key==="Escape")fermer(); else if(e.key==="ArrowRight")pas(1); else if(e.key==="ArrowLeft")pas(-1);
+  else if(e.key==="+"||e.key==="=")zoomer(1.4); else if(e.key==="-")zoomer(1/1.4);
+});
+
+/* ---------- Mode édition ---------- */
+function message(t){document.getElementById("ed-message").textContent=t}
+function activerChamps(){
+  [].forEach.call(vue.querySelectorAll("[data-k]"),function(el){
+    try{el.contentEditable="plaintext-only"}catch(err){el.contentEditable="true"}
+    if(el.contentEditable!=="plaintext-only") el.contentEditable="true";
+    el.spellcheck=true;
+  });
+}
+function basculerEdition(oui){ edition=oui; document.body.classList.toggle("edition",oui); message(""); afficher(); }
+document.getElementById("ed-quitter").onclick=function(){basculerEdition(false)};
+document.getElementById("ed-enregistrer").onclick=function(){
+  var texte="window.PORTFOLIO = "+JSON.stringify(D,null,2)+";\n";
+  function telecharger(){
+    var a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([texte],{type:"text/javascript"})); a.download="contenu.js";
+    document.body.appendChild(a); a.click(); a.remove();
+    message("Fichier téléchargé : remplace contenu.js dans le dossier du site.");
+  }
+  if(window.showSaveFilePicker){
+    window.showSaveFilePicker({suggestedName:"contenu.js",types:[{description:"Contenu du portfolio",accept:{"text/javascript":[".js"]}}]})
+      .then(function(h){return h.createWritable()}).then(function(w){return w.write(texte).then(function(){return w.close()})})
+      .then(function(){message("Enregistré. Remplace bien le contenu.js du dossier du site.")})
+      .catch(function(err){ if(err && err.name==="AbortError") return; telecharger(); });
+  } else telecharger();
+};
+
+cadre(); afficher();
+})();
+</script>
+</body>
+</html>

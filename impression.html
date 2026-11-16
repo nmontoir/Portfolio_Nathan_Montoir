@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio Nathan Montoir, version PDF</title>
+<style>
+/* Version imprimable : A4 paysage. Les pages sont composées par le script en bas de fichier :
+   chaque bloc est placé à la suite tant qu'il tient, les cartes sont réduites ou agrandies pour remplir la page. */
+:root{
+  --papier:#F1F3EF; --blanc:#FBFCFA; --encre:#17221E; --gris:#56645E; --trait:#C7D0C9; --foret:#2C5C47; --bistre:#B4622B;
+  --titre:"Archivo","Arial Narrow",Arial,sans-serif; --carte:"Newsreader",Georgia,serif;
+  color-scheme:light;
+}
+@font-face{font-family:"Archivo";src:url("assets/fonts/archivo.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%}
+@font-face{font-family:"Newsreader";src:url("assets/fonts/newsreader-italic.woff2") format("woff2");font-weight:200 800;font-style:italic}
+@page{size:A4 landscape;margin:0}
+*{box-sizing:border-box}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{margin:0;background:#fff;color:var(--encre);font-family:var(--titre);font-size:10pt;line-height:1.5}
+h1,h2,h3{font-stretch:116%;font-weight:700;line-height:1.1;margin:0;letter-spacing:-.01em}
+p{margin:0}
+img{max-width:100%;display:block}
+.etiquette{font-family:var(--carte);font-style:italic;letter-spacing:.14em;color:var(--gris);font-size:10.5pt}
+.aide{font-size:14px;background:var(--encre);color:#fff;padding:14px 20px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.aide button{font:inherit;font-weight:600;padding:8px 16px;background:var(--bistre);color:#fff;border:0;border-radius:2px;cursor:pointer}
+@media print{.aide{display:none}}
+@media screen{body{background:#8a938d}.page,.couverture{margin:16px auto;box-shadow:0 2px 10px rgba(0,0,0,.25)}}
+.page{position:relative;width:297mm;height:209.5mm;padding:12mm 14mm 0;background:#fff;overflow:hidden;break-after:page}
+.page:last-child{break-after:auto}
+.page .contenu{height:183mm;overflow:hidden}
+.page .pied{position:absolute;left:14mm;right:14mm;bottom:7mm;display:flex;justify-content:space-between;font-size:8pt;color:var(--gris)}
+
+/* Couverture */
+.couverture{width:297mm;height:209.5mm;display:grid;grid-template-columns:42% 58%;background:var(--papier);break-after:page;overflow:hidden;position:relative}
+.couverture .regle{position:absolute;left:0;right:0;top:0;height:3mm;background:repeating-linear-gradient(90deg,var(--encre) 0 14mm,#fff 14mm 28mm);border-bottom:.3mm solid var(--encre)}
+.couverture .texte{padding:30mm 12mm 18mm 18mm;display:flex;flex-direction:column}
+.couverture h1{font-size:50pt;font-weight:740;margin:5mm 0 4mm}
+.couverture .metier{font-stretch:116%;font-weight:560;font-size:16pt;color:var(--foret)}
+.couverture .accroche{margin-top:7mm;font-size:11.5pt;color:var(--gris);line-height:1.55}
+.couverture .bas{margin-top:auto;font-size:9.5pt;color:var(--gris)}
+.couverture .image{display:flex;flex-direction:column;justify-content:center;padding:14mm 16mm 14mm 4mm}
+.couverture .image img{border:.3mm solid var(--encre);box-shadow:3mm 3mm 0 var(--trait)}
+.couverture .image p{font-size:8.5pt;color:var(--gris);margin-top:6mm}
+
+.titre-page{display:flex;justify-content:space-between;align-items:flex-end;gap:10mm;margin-bottom:6mm;padding-bottom:3mm;border-bottom:.3mm solid var(--encre)}
+.titre-page h2{font-size:22pt}
+.titre-page .contact{text-align:right}
+.deux{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10mm}
+.prose{white-space:pre-line}
+.recherche{margin-top:4mm;padding:3mm 4mm;border-left:1.2mm solid var(--bistre);background:var(--papier)}
+h3.petit{font-size:11pt;margin:5mm 0 2mm}
+h3.petit:first-child{margin-top:0}
+.tableau{border-top:.3mm solid var(--encre)}
+.tableau .ligne{display:grid;grid-template-columns:38mm minmax(0,1fr);gap:4mm;padding:1.25mm 0;border-bottom:.2mm solid var(--trait);font-size:9pt}
+.tableau .cle{font-weight:650}
+.tableau .val{color:var(--gris)}
+.tableau .val strong{display:block;color:var(--encre);font-weight:650}
+.sommaire .ligne{grid-template-columns:8mm minmax(0,1fr) 34mm}
+.sommaire .num{color:var(--gris);font-variant-numeric:tabular-nums}
+.pastille{display:inline-block;width:4.2mm;height:2.8mm;border:.25mm solid var(--encre);margin-right:2mm;vertical-align:-.2mm}
+.bande-contact{display:flex;align-items:baseline;gap:8mm;margin-top:5mm;padding-top:3mm;border-top:.3mm solid var(--encre)}
+.bande-contact h3.petit{margin:0}
+.contact{display:flex;gap:4mm 12mm;flex-wrap:wrap;font-size:9.5pt}
+.contact .cle{font-size:7.5pt;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--gris)}
+
+/* Projet */
+.ouverture{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:10mm;align-items:start;margin-bottom:6mm}
+.ouverture.seule{grid-template-columns:minmax(0,150mm)}
+.volet{font-size:7.5pt;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--gris)}
+.ouverture h1{font-size:25pt;font-weight:720;margin:2.5mm 0 1.5mm}
+.ouverture .resume{font-size:11pt;margin:3mm 0 5mm}
+.ouverture .texte{margin-top:6mm}
+.ouverture .une img{margin-left:auto}
+.ouverture .une figcaption{text-align:right}
+.lienweb{margin:-2mm 0 5mm;font-size:8.5pt;color:var(--foret);word-break:break-all}
+.cartouche{border:.3mm solid var(--encre);background:var(--blanc);padding:.5mm 4mm;box-shadow:2mm 2mm 0 var(--trait)}
+.cartouche .ligne{display:grid;grid-template-columns:15mm minmax(0,1fr);gap:3mm;padding:1.6mm 0;border-bottom:.2mm solid var(--trait);font-size:8.3pt;line-height:1.4}
+.cartouche .ligne:last-child{border-bottom:0}
+.cartouche .cle{font-family:var(--carte);font-style:italic;letter-spacing:.05em;color:var(--gris)}
+.chiffres{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);border:.3mm solid var(--encre);background:var(--blanc);margin-bottom:6mm}
+.chiffres>div{padding:3mm 4mm;border-right:.2mm solid var(--trait)}
+.chiffres>div:last-child{border-right:0}
+.chiffres .valeur{font-stretch:116%;font-weight:720;font-size:16pt;line-height:1.1;color:var(--foret);font-variant-numeric:tabular-nums}
+.chiffres .lg{font-size:8.3pt;color:var(--gris);margin-top:1mm;line-height:1.35}
+.rang{margin-bottom:6mm}
+.rang.duo{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,7fr);gap:9mm;align-items:start}
+.rang.duo.inverse{grid-template-columns:minmax(0,7fr) minmax(0,4fr)}
+.sous-une{margin:5mm 0 0}
+.sous-une.duo,.sous-une.paire{display:block}
+.rang.paire{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10mm}
+.texte h2{font-size:12.5pt;margin-bottom:1.6mm}
+.texte{max-width:175mm}
+figure{margin:0}
+figure img{border:.2mm solid var(--trait);max-height:var(--hmax,150mm);width:auto;max-width:100%}
+figcaption{font-size:8pt;color:var(--gris);margin-top:1.6mm;line-height:1.35}
+.galerie{display:grid;gap:5mm;grid-template-columns:repeat(var(--col,2),minmax(0,1fr));align-items:start}
+.galerie figure img{margin:0 auto}
+pre{margin:0;padding:3.5mm 4.5mm;background:var(--encre);color:#E6ECE7;font-family:Consolas,"Cascadia Mono",Menlo,monospace;font-size:7.6pt;line-height:1.5;white-space:pre-wrap;border-radius:.5mm}
+.code h2{font-size:10pt;margin-bottom:2mm}
+</style>
+</head>
+<body>
+<div class="aide">
+  <span>Pour créer le PDF : clique sur le bouton, choisis « Enregistrer au format PDF », marges « Par défaut », et coche « Graphiques d'arrière-plan ». La mise en page se recalcule automatiquement à chaque ouverture.</span>
+  <button type="button" onclick="window.print()">Imprimer / Enregistrer en PDF</button>
+</div>
+<div id="doc"></div>
+<script src="contenu.js"></script>
+<script>
+(function(){
+"use strict";
+var D=window.PORTFOLIO;
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function typo(s){return String(s==null?"":s).replace(/ ([:;?!»%])/g," $1").replace(/« /g,"« ").replace(/(\d) (\d{3})(?!\d)/g,"$1 $2").replace(/(\d) (km²|km|ha|min|m|h)(?![\wÀ-ÿ])/g,"$1 $2")}
+function t(s){return esc(typo(s))}
+function src(i){return /[\/.]/.test(i)?i:"assets/img/"+i+"-m.jpg"}
+function couleur(v){var x=D.volets.filter(function(y){return y.nom===v})[0];return x?x.couleur:"#888"}
+function pastille(v){return '<span class="pastille" style="background:'+couleur(v)+'"></span>'}
+function fig(img,leg,cl){return '<figure'+(cl?' class="'+cl+'"':"")+'><img src="'+src(img)+'" alt="">'+(leg?"<figcaption>"+t(leg)+"</figcaption>":"")+"</figure>"}
+function texte(b){return '<div class="texte"><h2>'+t(b.titre)+'</h2><p class="prose">'+t(b.texte)+"</p></div>"}
+function visuel(b){
+  if(b.type==="image") return fig(b.img,b.legende,b.taille);
+  if(b.type==="avant-apres") return '<figure><div class="galerie" style="--col:2">'+fig(b.avant,"Avant")+fig(b.apres,"Après")+'</div><figcaption>'+t(b.legende.replace(/ ?Déplace le curseur pour comparer\.?/,""))+"</figcaption></figure>";
+  if(b.type==="galerie") return '<div class="galerie'+(b.colonnes>=4?" c4":"")+'" style="--col:'+(b.colonnes||2)+'">'+b.images.map(function(i){return fig(i.img,i.legende)}).join("")+"</div>";
+  if(b.type==="videos") return '<figure><div class="galerie c4" style="--col:'+b.videos.length+'">'+b.videos.map(function(v){return fig("assets/video/"+v.src+".jpg",v.titre+" (état en 2021)")}).join("")+'</div><figcaption>'+t(b.legende)+" Les animations sont visibles sur le site.</figcaption></figure>";
+  if(b.type==="code") return '<div class="code"><h2>'+t(b.titre)+"</h2><pre>"+esc(b.code)+"</pre></div>";
+  return "";
+}
+/* Hauteur de départ des images (mm), ajustée ensuite à la page */
+function hauteur(b){
+  if(b.type==="galerie"){var c=b.colonnes||2;return c>=4?62:c===3?80:95}
+  if(b.type==="videos"||b.type==="avant-apres") return 70;
+  if(b.type==="image") return b.taille==="moyenne"?120:150;
+  return 0;
+}
+function blocs(L){
+  L=L.filter(function(b){return !(b.type==="texte" && !String(b.titre||"").trim() && !String(b.texte||"").trim())});
+  var h=[],i=0;
+  while(i<L.length){
+    var a=L[i],b=L[i+1];
+    if(a.type==="texte" && b && (b.type==="image"||b.type==="avant-apres"||b.type==="code")){h.push('<div class="rang duo" data-h="118">'+texte(a)+visuel(b)+"</div>");i+=2}
+    else if(a.type==="texte" && b && b.type==="texte"){h.push('<div class="rang paire">'+texte(a)+texte(b)+"</div>");i+=2}
+    else if(a.type==="code" && b && b.type==="texte"){h.push('<div class="rang duo inverse">'+visuel(a)+texte(b)+"</div>");i+=2}
+    else if(a.type==="texte"){h.push('<div class="rang">'+texte(a)+"</div>");i++}
+    else{h.push('<div class="rang" data-h="'+hauteur(a)+'">'+visuel(a)+"</div>");i++}
+  }
+  return h;
+}
+var P=D.profil;
+var doc=document.getElementById("doc");
+var MM=96/25.4;
+
+/* Couverture */
+var couv='<section class="couverture"><div class="regle"></div><div class="texte"><span class="etiquette">Portfolio de géomatique</span><h1>'+t(P.nom)+'</h1><p class="metier">'+t(P.metier)+'</p><p class="accroche">'+t(P.accroche)+'</p><p class="bas">'+D.projets.length+" projets · "+D.volets.map(function(v){return esc(v.nom)}).join(" · ")+'</p></div><div class="image"><img src="'+src(P.image_accueil)+'" alt=""><p>'+t(P.legende_accueil)+"</p></div></section>";
+
+/* Profil */
+var profil='<div class="titre-page"><h2>Profil</h2><div class="contact">'+P.contact.map(function(c){return '<div><div class="cle">'+t(c.libelle)+"</div>"+t(c.valeur)+"</div>"}).join("")+'</div></div><div class="deux"><div><p class="prose">'+t(P.a_propos)+'</p><p class="recherche">'+t(P.recherche)+'</p><h3 class="petit">Parcours</h3><div class="tableau">'
+  +D.parcours.map(function(x){return '<div class="ligne"><div class="cle">'+t(x.periode)+'</div><div class="val"><strong>'+t(x.titre)+"</strong>"+t(x.detail)+"</div></div>"}).join("")
+  +"</div></div><div>"
+  +'<h3 class="petit">Compétences</h3><div class="tableau">'+D.competences.map(function(c){return '<div class="ligne"><div class="cle">'+t(c.titre)+'</div><div class="val">'+t(c.liste)+"</div></div>"}).join("")+"</div>"
+  +'<h3 class="petit">Projets présentés</h3><div class="tableau sommaire">'+D.projets.map(function(p,i){return '<div class="ligne"><div class="num">'+(i<9?"0":"")+(i+1)+'</div><div class="cle">'+t(p.titre)+'</div><div class="val">'+pastille(p.volet)+esc(p.volet)+"</div></div>"}).join("")+"</div></div></div>"
+  ;
+
+/* Projets : liste de blocs à placer */
+var projets=D.projets.map(function(p){
+  var L=p.blocs.slice(), une="", intro="", utilise="", k, items=[];
+  for(k=0;k<Math.min(3,L.length);k++){ if(L[k].type==="image"){ une=fig(L[k].img,L[k].legende); utilise=L[k].img; L.splice(k,1); break; } }
+  if(!une && p.couverture){ une=fig(p.couverture,""); utilise=p.couverture; }
+  if(L.length && L[0].type==="texte"){ intro=texte(L[0]); L.shift(); }
+  L=L.map(function(b){
+    if(b.type!=="galerie") return b;
+    var im=b.images.filter(function(i){return i.img!==utilise});
+    return {type:"galerie",colonnes:(im.length===3?3:b.colonnes),images:im};
+  });
+  items.push('<div class="ouverture'+(une?"":" seule")+'" data-h="132"><div><div class="volet">'+pastille(p.volet)+esc(p.volet)+"</div><h1>"+t(p.titre)+'</h1><span class="etiquette">'+t(p.lieu)+'</span><p class="resume">'+t(p.resume)+"</p>"
+    +(p.lien?'<p class="lienweb">'+t(p.lien.texte)+" : "+esc(p.lien.url)+"</p>":"")+'<div class="cartouche">'
+    +[["cadre","Cadre"],["date","Date"],["role","Rôle"],["outils","Outils"],["sources","Sources"]].map(function(c){return '<div class="ligne"><div class="cle">'+c[1]+"</div><div>"+t(p[c[0]])+"</div></div>"}).join("")+"</div>"+intro+"</div>"
+    +(une?'<div class="une">'+une+"</div>":"")+"</div>");
+  if(p.chiffres&&p.chiffres.length) items.push('<div class="chiffres">'+p.chiffres.map(function(c){return '<div><div class="valeur">'+t(c.valeur)+'</div><div class="lg">'+t(c.legende)+"</div></div>"}).join("")+"</div>");
+  return items.concat(blocs(L));
+});
+
+/* ---------- Mise en pages ---------- */
+function nouvellePage(){
+  var pg=document.createElement("section"); pg.className="page";
+  pg.innerHTML='<div class="contenu"></div><div class="pied"><span>'+esc(P.nom)+' · Portfolio</span><span class="numero"></span></div>';
+  doc.appendChild(pg); return pg.firstChild;
+}
+function deborde(c){return c.scrollHeight>c.clientHeight+1}
+function lignesImages(c){return [].filter.call(c.children,function(e){return +e.getAttribute("data-h")>0})}
+function poser(e,h){e.setAttribute("data-cur",h);e.style.setProperty("--hmax",h+"mm")}
+/* Réduit les images de la page d'un facteur f (par rapport à leur hauteur de départ) */
+function echelle(c,f,mini){lignesImages(c).forEach(function(e){poser(e,Math.max(mini,Math.round(+e.getAttribute("data-h")*f)))})}
+function reduirePourTenir(c,fmin,mini){
+  if(!deborde(c)) return true;
+  for(var f=0.95;f>=fmin-1e-9;f-=0.05){ echelle(c,f,mini); if(!deborde(c)) return true; }
+  return false;
+}
+/* Agrandit les images jusqu'à remplir la page, sans dépasser 1,25 × leur hauteur de départ */
+function remplir(c){
+  var L=lignesImages(c); if(!L.length) return;
+  var ok=true;
+  while(ok){
+    ok=false;
+    L.forEach(function(e){
+      var cur=+e.getAttribute("data-cur"), max=Math.min(165,+e.getAttribute("data-h")*1.6);
+      if(cur+3<=max){ poser(e,cur+3); if(deborde(c)) poser(e,cur); else ok=true; }
+    });
+  }
+}
+/* Pour une galerie, essaie plusieurs nombres de colonnes et garde la disposition où les cartes sont les plus grandes */
+function surfaceImages(e){return [].reduce.call(e.querySelectorAll("img"),function(a,im){return a+im.offsetWidth*im.offsetHeight},0)}
+function optimiserGaleries(c){
+  [].forEach.call(c.querySelectorAll(".rang > .galerie, .rang > figure > .galerie"),function(g){
+    var e=g.closest(".rang"), n=g.children.length, ini=+g.style.getPropertyValue("--col")||2, best=null;
+    var cur0=e.getAttribute("data-cur");
+    for(var col=n; col>=1; col--){
+      g.style.setProperty("--col",col);
+      var lo=30,hi=165;
+      poser(e,lo); if(deborde(c)) continue;
+      while(hi-lo>2){var m=(lo+hi)/2; poser(e,Math.round(m)); if(deborde(c)) hi=m; else lo=m;}
+      poser(e,Math.round(lo)); var a=surfaceImages(e);
+      if(!best||a>best.a*1.04) best={col:col,h:Math.round(lo),a:a};
+    }
+    if(best){g.style.setProperty("--col",best.col); poser(e,best.h); e.setAttribute("data-h",best.h);} else {g.style.setProperty("--col",ini); poser(e,cur0);}
+  });
+}
+function ajouter(c,html){
+  var w=document.createElement("div"); w.innerHTML=html; var e=w.firstChild;
+  if(+e.getAttribute("data-h")>0) poser(e,+e.getAttribute("data-h"));
+  c.appendChild(e); return e;
+}
+function composer(items){
+  var c=nouvellePage();
+  items.forEach(function(html,i){
+    var e=ajouter(c,html);
+    if(!deborde(c)) return;
+    /* Ce bloc ne tient pas : on essaie d'abord de réduire un peu les cartes de la page */
+    var avant=lignesImages(c).map(function(x){return x.getAttribute("data-cur")});
+    if(c.children.length>1 && reduirePourTenir(c,0.5,42)) return;
+    lignesImages(c).forEach(function(x,j){poser(x,avant[j])});
+    /* Sinon, sous la carte d'ouverture, dans la colonne de droite */
+    var col=c.querySelector(".ouverture .une");
+    /* (seulement pour le dernier bloc d'un projet, pour éviter une page presque vide à la fin) */
+    if(col && i===items.length-1 && !(+e.getAttribute("data-h")>0) && !e.classList.contains("chiffres")){
+      col.appendChild(e); e.classList.add("sous-une");
+      if(!deborde(c) || reduirePourTenir(c,0.6,75)) return;
+      lignesImages(c).forEach(function(x,j){poser(x,avant[j])});
+      c.appendChild(e); e.classList.remove("sous-une");
+    }
+    c.removeChild(e);
+    optimiserGaleries(c); remplir(c);
+    c=nouvellePage();
+    c.appendChild(e); poser(e,+e.getAttribute("data-h")||0);
+    if(+e.getAttribute("data-h")>0) e.style.setProperty("--hmax",e.getAttribute("data-h")+"mm");
+    reduirePourTenir(c,0.3,35);
+  });
+  optimiserGaleries(c); remplir(c);
+}
+function profilPage(){
+  var c=nouvellePage(); c.parentNode.classList.add("profil"); c.innerHTML=profil;
+  var fs=10; while(deborde(c) && fs>8){ fs-=0.2; c.style.fontSize=fs+"pt"; }
+}
+function mettreEnPage(){
+  doc.innerHTML=couv;
+  profilPage();
+  projets.forEach(composer);
+  [].forEach.call(doc.querySelectorAll(".page"),function(pg,i){pg.querySelector(".numero").textContent=i+2});
+  document.body.setAttribute("data-pret","1");
+}
+/* Attendre polices et images avant de mesurer */
+var urls=[]; projets.concat([[couv]]).forEach(function(L){L.forEach(function(h){(h.match(/src="[^"]+"/g)||[]).forEach(function(m){urls.push(m.slice(5,-1))})})});
+Promise.all([document.fonts?document.fonts.ready:Promise.resolve()].concat(urls.map(function(u){return new Promise(function(r){var im=new Image();im.onload=im.onerror=r;im.src=u})}))).then(mettreEnPage);
+})();
+</script>
+</body>
+</html>
